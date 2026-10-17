@@ -124,6 +124,14 @@ h2::before{content:"";width:14px;height:12px;flex:none;background:var(--accent);
 .photos a span{font-weight:400;font-size:.72rem;color:var(--muted);overflow-wrap:anywhere}
 .photos a:focus-visible{outline:2px solid var(--best);outline-offset:2px}
 
+.mname{font-weight:700;font-size:.92rem;margin:10px 0 4px}.mname:first-child{margin-top:0}
+.member.day{padding-left:10px}
+.member.day label{color:var(--muted);font-size:.85rem}
+.yen{display:flex;align-items:center;gap:4px;font-size:.85rem}
+.yen input{font:inherit;width:6.5em;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-align:right}
+details.mini{margin-top:6px}
+details.mini summary{font-size:.85rem;cursor:pointer}
+.kpnotes{margin:0;padding-left:1.2em;font-size:.8rem;color:var(--muted);display:flex;flex-direction:column;gap:4px}
 .d2{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);margin:-2px 0 6px}
 .d2 input{width:20px;height:20px;accent-color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){.fill{transition:width .35s ease}}
@@ -148,21 +156,55 @@ h2::before{content:"";width:14px;height:12px;flex:none;background:var(--accent);
 
 
   <section class="panel" aria-labelledby="rent-h">
-    <h2 id="rent-h">レンタルと2日目を選ぶ</h2>
+    <h2 id="rent-h">レンタルを1日目・2日目で選ぶ</h2>
     <div id="members"></div>
-    <p class="hint">レンタルはスキー場ごとの料金で足しています。2日目に滑らない人は、2日目のリフト券とレンタル分を引きます。グローブ・ゴーグル・帽子はどこも持参です。</p>
+    <p class="hint">1日目・2日目それぞれ、借りるものを選べます（1日分はスキー場の料金の半額で計算）。2日目に「滑らない」を選ぶと、2日目のリフト券も引きます。グローブ・ゴーグル・帽子はどこも持参です。</p>
+  </section>
+
+  <section class="panel" aria-labelledby="sc-h">
+    <h2 id="sc-h">スクールを選ぶ</h2>
+    <div id="school"></div>
+    <p class="hint">スキーのグループレッスン料金（半日＝約2時間、1日＝約4時間）。どこもリフト券は別に必要です。</p>
+    <details class="mini"><summary>スクール料金の一覧（1人）</summary>
+      <div class="tablewrap"><table><thead><tr><th></th><th>大人<br>半日／1日</th><th>小学生<br>半日／1日</th><th>年長<br>半日／1日</th></tr></thead><tbody id="sctable"></tbody></table></div>
+      <ul class="kpnotes" id="scnotes"></ul>
+    </details>
+  </section>
+
+  <section class="panel" aria-labelledby="kp-h" id="kp-panel">
+    <h2 id="kp-h">キッズパークに入る人を選ぶ</h2>
+    <div id="kp-members"></div>
+    <div class="member"><label for="kp-days">入る日数</label>
+      <select id="kp-days"><option value="1">1日</option><option value="2">2日</option></select></div>
+    <p class="hint">子どもと一緒に入る付き添いの大人も選べます。スキー場によっては付き添いの大人にも入場券が要るので、その分を足しています。</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>1日・1人</th><th>子ども</th><th>大人</th></tr></thead>
+        <tbody id="kptable"></tbody>
+      </table>
+    </div>
+    <ul class="kpnotes" id="kpnotes"></ul>
+  </section>
+
+  <section class="panel" aria-labelledby="ln-h">
+    <h2 id="ln-h">ゲレンデの昼ごはん</h2>
+    <div class="member"><label for="ln-days">食べる日数</label>
+      <select id="ln-days"><option value="0">入れない</option><option value="1">1日</option><option value="2">2日</option></select></div>
+    <div class="member"><label for="ln-adult">大人 1食</label><span class="yen"><input type="number" id="ln-adult" min="0" step="100" inputmode="numeric">円</span></div>
+    <div class="member"><label for="ln-kid">子ども 1食</label><span class="yen"><input type="number" id="ln-kid" min="0" step="100" inputmode="numeric">円</span></div>
+    <p class="hint">ゲレンデのレストランはカレーやラーメンで1食1,500〜2,000円くらいが目安。金額は自由に変えられます（7プランとも同じ額で足します）。</p>
   </section>
 
   <section class="panel" aria-labelledby="sum-h">
     <h2 id="sum-h"><span id="sum-who">伊藤家</span>の総額（安い順）</h2>
     <div class="bars" id="bars"></div>
-    <p class="hint">宿泊・食事・リフト2日・交通費の割り勘（行き先ごとに計算）・選んだレンタル込み。スクールは別です。</p>
+    <p class="hint">宿泊・食事・リフト2日・交通費の割り勘（行き先ごとに計算）に、選んだレンタル・スクール・キッズパーク・昼ごはんを足した金額です。</p>
   </section>
 
   <section class="cards" id="cards" aria-label="プラン一覧"></section>
 
   <details>
-    <summary>レンタル料金の一覧（2日分）</summary>
+    <summary>レンタル料金の一覧（2日分・1日分はこの半額）</summary>
     <div class="tablewrap">
       <table>
         <thead><tr><th></th><th>水上高原<br>A</th><th>湯沢中里<br>B</th><th>軽井沢<br>C</th><th>ノルン<br>D</th><th>たんばら<br>E</th><th>ハンター<br>F</th><th>ロイヤルヒル<br>G</th></tr></thead>
@@ -239,25 +281,29 @@ h2::before{content:"";width:14px;height:12px;flex:none;background:var(--accent);
   var MARK = {ex:["◎","m-ex"], ok:["○","m-ok"], tri:["△","m-tri"], x:["×","m-x"]};
 
   var state = {g:"ito", sel:{}};
-  try{ var saved = JSON.parse(localStorage.getItem("ski5-ito") || "null"); if(saved && saved.sel) state.sel = saved.sel; if(saved && saved.d2) state.d2 = saved.d2; state.g = "ito"; }catch(e){}
+  try{ var saved = JSON.parse(localStorage.getItem("ski7-ito") || "null"); if(saved && saved.sel) state.sel = saved.sel; if(saved && saved.sel2) state.sel2 = saved.sel2; if(saved && saved.school) state.school = saved.school; if(saved && saved.kp2) state.kp2 = saved.kp2; if(saved && saved.lunch) state.lunch = saved.lunch; if(saved && saved.d2) state.d2 = saved.d2; state.g = "ito"; }catch(e){}
   Object.keys(GROUPS).forEach(function(k){
     if(!state.sel[k]) state.sel[k] = GROUPS[k].members.map(function(m){return m.d;});
   });
-  function save(){ try{ localStorage.setItem("ski5-ito", JSON.stringify(state)); }catch(e){} }
+  function save(){ try{ localStorage.setItem("ski7-ito", JSON.stringify(state)); }catch(e){} }
 
   function yen(n){ return n.toLocaleString("ja-JP") + "円"; }
   function man(n){ return "約" + (Math.round(n/1000)/10).toFixed(1) + "万円"; }
   if(!state.d2) state.d2 = {};
   Object.keys(GROUPS).forEach(function(k){ if(!state.d2[k]) state.d2[k] = GROUPS[k].members.map(function(){ return true; }); });
+  if(!state.sel2) state.sel2 = {};
+  Object.keys(GROUPS).forEach(function(k){ if(!state.sel2[k]) state.sel2[k] = GROUPS[k].members.map(function(m, i){ return state.d2[k][i] === false ? "off" : (state.sel[k][i] || "none"); }); });
   // Naeba prices the 2nd day lower; elsewhere the 2-day price is two equal days
   var NAEBA_D2 = {kid:{ski:5000,board:5500,skiwear:9000,boardwear:9500}, adult:{ski:6500,board:6500,skiwear:11500,boardwear:11500}};
   function rentDay2(resort, t, o){ return resort === "naeba" ? NAEBA_D2[t][o] : RENT[resort][t][o] / 2; }
-  function skisDay2(g, i){ return state.d2[g][i] !== false; }
+  function skisDay2(g, i){ return state.sel2[g][i] !== "off"; }
+  function rentDay1(resort, t, o){ return RENT[resort][t][o] - rentDay2(resort, t, o); }
   function rentalFor(plan, g){
     var r = RENT[plan.resort], sum = 0;
     GROUPS[g].members.forEach(function(m, i){
-      var o = state.sel[g][i];
-      if(o && o !== "none" && r[m.t][o] != null){ sum += r[m.t][o]; if(!skisDay2(g, i)) sum -= rentDay2(plan.resort, m.t, o); }
+      var o1 = state.sel[g][i], o2 = state.sel2[g][i];
+      if(o1 && o1 !== "none" && r[m.t][o1] != null) sum += rentDay1(plan.resort, m.t, o1);
+      if(o2 && o2 !== "none" && o2 !== "off" && r[m.t][o2] != null) sum += rentDay2(plan.resort, m.t, o2);
     });
     return sum;
   }
@@ -268,9 +314,100 @@ h2::before{content:"";width:14px;height:12px;flex:none;background:var(--accent);
     });
     return cut;
   }
-  function boardNG(plan, g){ var r = RENT[plan.resort]; return GROUPS[g].members.some(function(m, i){ var o = state.sel[g][i]; return o && o !== "none" && r[m.t][o] == null; }); }
-  function anyOff(g){ return state.d2[g].some(function(v){ return v === false; }); }
-  function totalFor(plan, g){ return plan.base[g] - liftCut(plan, g) + rentalFor(plan, g); }
+  function boardNG(plan, g){ var r = RENT[plan.resort]; return GROUPS[g].members.some(function(m, i){ return [state.sel[g][i], state.sel2[g][i]].some(function(o){ return o && o !== "none" && o !== "off" && r[m.t][o] == null; }); }); }
+  function anyOff(g){ return state.sel2[g].some(function(v){ return v === "off"; }); }
+  var KP = {
+    minakami:{name:"水上高原", kid:1200, adult:1200, note:"水上高原：オープン週に公式サイトのプランで泊まる人の料金（通常は1,800円）。3歳以上は大人も子どもも同額。そり・チュービングは無料貸出。"},
+    nakazato:{name:"湯沢中里", kid:1000, adult:1000, note:"湯沢中里：スマイルキッズパーク 1,000円（2歳以上・大人も同額）。ソリ・チュービング・スノーエスカレーター込み。"},
+    karuizawa:{name:"軽井沢", kid:2500, adult:2500, note:"軽井沢：スノーマンパーク 入園券2,500円〜（大人・子ども共通、期間で変動）。ソリ・チュービング・スノーエスカレーター。"},
+    norn:{name:"ノルン", kid:2000, adult:1000, note:"ノルン：スノーランド。ソリ遊び込み2,000円（2歳から）、付き添いの大人は入場のみ1,000円で計算。"},
+    tanbara:{name:"たんばら", kid:1800, adult:1800, note:"たんばら：キッズパーク（たんばランド）1日1,800円（3歳以上・大人も同額）。"},
+    hunter:{name:"ハンター", kid:2000, adult:2000, note:"ハンター：キッズパーク 2,000円（大人・子ども共通、3歳以上、リフト代込み）。ソリ・チュービングも込み。"},
+    royalhill:{name:"ロイヤルヒル", kid:0, adult:0, note:"ロイヤルヒル：有料のキッズパークはなし。雪遊び広場・ソリコースと、宿のキッズルーム（無料）で遊べます。"}
+  };
+  // School (ski group lesson): [half, full] per person
+  var SCH = {
+    minakami:{name:"水上高原", adult:[7500,11000], kid:[7500,11000], pre:[9000,13500], note:"水上高原：水上高原スキースクール。年長はキンダーレッスン（5・6歳）、小学生はジュニアレッスン（今シーズン料金）。"},
+    nakazato:{name:"湯沢中里", adult:[6000,10000], kid:[7500,13000], pre:[7500,13000], note:"湯沢中里：SMILE SNOW SCHOOL（3歳〜）。子どもは一般ジュニアレッスン（昨シーズン料金）。"},
+    karuizawa:{name:"軽井沢", adult:[7000,14000], kid:[7000,14000], pre:null, note:"軽井沢：軽井沢スキー学校（小学生以上、今シーズン料金）。年長が入れるパンダルマン（3〜9歳）は料金が公開されていないため、足していません。"},
+    norn:{name:"ノルン", adult:[7500,12000], kid:[7000,14000], pre:[7000,14000], note:"ノルン：ノルンみなかみスキースクール。子どもは親子参加の「るんるん」休日7,000円/回、大人はステージクラス120分7,500円・240分12,000円。"},
+    tanbara:{name:"たんばら", adult:[6600,12100], kid:[6600,12100], pre:[6600,12100], note:"たんばら：SAJ公認スクールのグループレッスン（大人・子ども共通、120分×1コマ／2コマ、今シーズン料金）。"},
+    hunter:{name:"ハンター", adult:[5000,9000], kid:[6000,9500], pre:[6000,9500], note:"ハンター：SAJ公認スキースクール。子どもは4歳から（昨シーズン料金）。"},
+    royalhill:{name:"ロイヤルヒル", adult:null, kid:null, pre:null, note:"ロイヤルヒル：スクール料金が公開されていないため、足していません。"}
+  };
+  var SOPTS = [["none","なし",0,0],["h1","半日×1日",0,1],["f1","1日×1日",1,1],["h2","半日×2日",0,2],["f2","1日×2日",1,2]];
+  function schType(m){ return m.t === "adult" ? "adult" : (m.p ? "pre" : "kid"); }
+  if(!state.school) state.school = {};
+  Object.keys(GROUPS).forEach(function(k){ if(!state.school[k]) state.school[k] = GROUPS[k].members.map(function(){ return "none"; }); });
+  function schoolOf(plan, g){
+    var s = SCH[plan.resort], sum = 0, ng = false;
+    GROUPS[g].members.forEach(function(m, i){
+      var o = SOPTS.filter(function(x){ return x[0] === state.school[g][i]; })[0];
+      if(!o || o[0] === "none") return;
+      var pr = s[schType(m)];
+      if(!pr){ ng = true; return; }
+      sum += pr[o[2]] * o[3];
+    });
+    return {sum: sum, ng: ng};
+  }
+  // Kids park
+  if(!state.kp2) state.kp2 = {};
+  Object.keys(GROUPS).forEach(function(k){ if(!state.kp2[k]) state.kp2[k] = {on: GROUPS[k].members.map(function(){ return false; }), days: 1}; });
+  function kpFor(plan, g){
+    var k = KP[plan.resort], st = state.kp2[g || state.g], sum = 0;
+    GROUPS[g || state.g].members.forEach(function(m, i){ if(st.on[i]) sum += (m.t === "adult" ? k.adult : k.kid); });
+    return sum * (+st.days || 1);
+  }
+  // Lunch
+  if(!state.lunch) state.lunch = {days: 0, adult: 1800, kid: 1200};
+  function lunchFor(g){
+    var L = state.lunch, d = +L.days || 0;
+    return GROUPS[g].members.reduce(function(a, m){ return a + (m.t === "adult" ? +L.adult || 0 : +L.kid || 0); }, 0) * d;
+  }
+  function totalFor(plan, g){ return plan.base[g] - liftCut(plan, g) + rentalFor(plan, g) + schoolOf(plan, g).sum + kpFor(plan, g) + lunchFor(g); }
+  function renderExtras(){
+    var g = state.g, mem = GROUPS[g].members;
+    var box = document.getElementById("school"); box.innerHTML = "";
+    mem.forEach(function(m, i){
+      var row = document.createElement("div"); row.className = "member";
+      var id = "sc-" + g + "-" + i;
+      var lab = document.createElement("label"); lab.htmlFor = id; lab.textContent = m.n;
+      var s = document.createElement("select"); s.id = id;
+      SOPTS.forEach(function(o){ var op = document.createElement("option"); op.value = o[0]; op.textContent = o[1]; s.appendChild(op); });
+      s.value = state.school[g][i] || "none";
+      s.addEventListener("change", function(){ state.school[g][i] = s.value; save(); renderNumbers(); });
+      row.appendChild(lab); row.appendChild(s); box.appendChild(row);
+    });
+    var hasKid = mem.some(function(m){ return m.t === "kid"; });
+    document.getElementById("kp-panel").style.display = "";
+    var kb = document.getElementById("kp-members"); kb.innerHTML = "";
+    mem.forEach(function(m, i){
+      var row = document.createElement("div"); row.className = "member";
+      var id = "kpm-" + g + "-" + i;
+      var lab = document.createElement("label"); lab.htmlFor = id; lab.textContent = m.n + (m.t === "adult" ? "（付き添い）" : "");
+      var cb = document.createElement("input"); cb.type = "checkbox"; cb.id = id; cb.checked = !!state.kp2[g].on[i];
+      cb.addEventListener("change", function(){ state.kp2[g].on[i] = cb.checked; save(); renderNumbers(); });
+      row.appendChild(lab); row.appendChild(cb); kb.appendChild(row);
+    });
+    var ds = document.getElementById("kp-days"); ds.value = String(state.kp2[g].days || 1);
+    ds.onchange = function(){ state.kp2[g].days = +ds.value; save(); renderNumbers(); };
+    var ld = document.getElementById("ln-days"), la = document.getElementById("ln-adult"), lk = document.getElementById("ln-kid");
+    ld.value = String(state.lunch.days || 0); la.value = state.lunch.adult; lk.value = state.lunch.kid;
+    lk.parentNode.parentNode.style.display = hasKid ? "" : "none";
+    ld.onchange = function(){ state.lunch.days = +ld.value; save(); renderNumbers(); };
+    la.oninput = function(){ state.lunch.adult = +la.value || 0; save(); renderNumbers(); };
+    lk.oninput = function(){ state.lunch.kid = +lk.value || 0; save(); renderNumbers(); };
+  }
+  function renderStatic(){
+    var order = ["minakami","nakazato","karuizawa","norn","tanbara","hunter","royalhill"];
+    var f = function(a){ return a ? yen(a[0]) + "／" + yen(a[1]) : "非公開"; };
+    document.getElementById("sctable").innerHTML = order.map(function(k){ var s = SCH[k]; return "<tr><td>" + s.name + "</td><td>" + f(s.adult) + "</td><td>" + f(s.kid) + "</td><td>" + f(s.pre) + "</td></tr>"; }).join("");
+    document.getElementById("scnotes").innerHTML = order.map(function(k){ return "<li>" + SCH[k].note + "</li>"; }).join("");
+    var ko = ["nakazato","norn","minakami","tanbara","karuizawa","hunter","royalhill"];
+    document.getElementById("kptable").innerHTML = ko.map(function(k){ return "<tr><td>" + KP[k].name + "</td><td>" + yen(KP[k].kid) + "</td><td>" + yen(KP[k].adult) + "</td></tr>"; }).join("");
+    document.getElementById("kpnotes").innerHTML = ko.map(function(k){ return "<li>" + KP[k].note + "</li>"; }).join("");
+  }
+  renderStatic();
 
   // segmented control
   var seg = document.getElementById("seg");
@@ -284,21 +421,20 @@ h2::before{content:"";width:14px;height:12px;flex:none;background:var(--accent);
   function renderMembers(){
     var box = document.getElementById("members"); box.innerHTML = "";
     GROUPS[state.g].members.forEach(function(m, i){
-      var row = document.createElement("div"); row.className = "member";
-      var id = "rent-" + state.g + "-" + i;
-      var lab = document.createElement("label"); lab.htmlFor = id; lab.textContent = m.n + (m.t === "kid" ? "" : "");
-      var s = document.createElement("select"); s.id = id;
-      OPTS.forEach(function(o){ var op = document.createElement("option"); op.value = o[0]; op.textContent = o[1]; s.appendChild(op); });
-      s.value = state.sel[state.g][i] || "none";
-      s.addEventListener("change", function(){ state.sel[state.g][i] = s.value; save(); renderNumbers(); });
-      row.appendChild(lab); row.appendChild(s); box.appendChild(row);
-      var dl = document.createElement("label"); dl.className = "d2";
-      var cb = document.createElement("input"); cb.type = "checkbox"; cb.id = "d2-" + state.g + "-" + i; cb.checked = skisDay2(state.g, i);
-      cb.addEventListener("change", function(){ state.d2[state.g][i] = cb.checked; save(); renderNumbers(); });
-      dl.appendChild(cb); dl.appendChild(document.createTextNode("2日目（日曜）も滑る"));
-      box.appendChild(dl);
+      var nm = document.createElement("div"); nm.className = "mname"; nm.textContent = m.n; box.appendChild(nm);
+      [["sel","1日目（土）",OPTS],["sel2","2日目（日）",OPTS.concat([["off","滑らない"]])]].forEach(function(d){
+        var row = document.createElement("div"); row.className = "member day";
+        var id = "rent-" + d[0] + "-" + state.g + "-" + i;
+        var lab = document.createElement("label"); lab.htmlFor = id; lab.textContent = d[1];
+        var s = document.createElement("select"); s.id = id;
+        d[2].forEach(function(o){ var op = document.createElement("option"); op.value = o[0]; op.textContent = o[1]; s.appendChild(op); });
+        s.value = state[d[0]][state.g][i] || "none";
+        s.addEventListener("change", function(){ state[d[0]][state.g][i] = s.value; save(); renderNumbers(); });
+        row.appendChild(lab); row.appendChild(s); box.appendChild(row);
+      });
     });
   }
+
 
   function renderNumbers(){
     var g = state.g;
@@ -324,11 +460,12 @@ h2::before{content:"";width:14px;height:12px;flex:none;background:var(--accent);
         '<div class="body">' +
           '<div><div class="title">' + p.name + '</div><span class="date">' + p.date + '</span></div>' +
           '<div class="price"><span class="who">' + GROUPS[g].label + 'の総額</span><span class="big">' + man(t) + '</span>' +
-            '<span class="sub">うちレンタル ' + (rent ? yen(rent) : "なし") + '　／　7人の合計（レンタル別）' + man(p.total7) + '</span></div>' +
+            '<span class="sub">うちレンタル ' + (rent ? yen(rent) : "なし") + '／スクール ' + (schoolOf(p, g).sum ? yen(schoolOf(p, g).sum) : "なし") + '／キッズパーク ' + (kpFor(p, g) ? yen(kpFor(p, g)) : "なし") + '／昼ごはん ' + (lunchFor(g) ? yen(lunchFor(g)) : "なし") + '</span></div>' +
           '<dl class="facts"><dt>宿</dt><dd>' + p.hotel + '（' + p.access + '）</dd><dt>スキー場</dt><dd>' + p.area + '</dd><dt>移動</dt><dd>車で' + p.drive + '（高速' + p.t.hw + '＋下道' + p.t.local + '分）</dd><dt>交通費</dt><dd>7人で' + yen(p.t.total) + '、大人1人' + yen(p.share) + '<br><small>レンタカー' + yen(40000) + '・高速 往復' + yen(p.t.toll) + '・ガソリン約' + yen(p.t.gas) + (p.t.park ? '・駐車場' + yen(p.t.park) : '') + '</small></dd><dt>部屋</dt><dd>' + p.rooms + '</dd></dl>' +
           '<ul class="rates">' + rates + '</ul>' +
           '<div class="photos"><a href="' + p.roomUrl + '" target="_blank" rel="noopener">部屋の写真を見る<span>' + p.hotel + '</span></a><a href="' + p.kidsUrl + '" target="_blank" rel="noopener">キッズパークの写真を見る<span>' + p.kidsName + '</span></a></div>' +
           (anyOff(g) ? '<p class="note">2日目に滑らない人の分として ' + (liftCut(p, g) ? 'リフト券 ' + yen(liftCut(p, g)) : 'リフト券 0円') + ' を引いています。' + (p.liftIncl ? 'リフト券込みのプランなので、滑らなくても宿泊費は変わりません。' : '') + '</p>' : '') +
+          (schoolOf(p, g).ng ? '<p class="note">このスキー場は選んだ人のスクール料金が公開されていないため、スクール代は足していません。</p>' : '') +
           (boardNG(p, g) ? '<p class="note">このスキー場はスキー専用で、ボードのレンタルはできません（ボードの人の分は足していません）。</p>' : '') +
           '<p class="note">' + p.note + '</p>' +
         '</div>';
@@ -346,7 +483,7 @@ h2::before{content:"";width:14px;height:12px;flex:none;background:var(--accent);
 
   function render(){
     Object.keys(GROUPS).forEach(function(k){ var el = document.getElementById("seg-" + k); if(el) el.setAttribute("aria-pressed", k === state.g ? "true" : "false"); });
-    renderMembers(); renderNumbers();
+    renderMembers(); renderExtras(); renderNumbers();
   }
   renderTable(); render();
 })();
