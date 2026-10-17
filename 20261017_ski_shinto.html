@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>冬スキー比較 しんとうくん</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Layout: one narrow column built for a phone — group switcher, a bar summary, then one lift-ticket card per plan */
+:root{
+  --bg:#EEF3F6; --surface:#FFFFFF; --ink:#13263A; --muted:#5A6B7C; --line:#D5DEE5;
+  --accent:#0B6E79; --accent-soft:#D9ECEE; --best:#D9502A;
+  --good:#1F7A4A; --ok:#0B6E79; --warn:#A86A00; --bad:#B2382B;
+  --font-display:"Dela Gothic One","Hiragino Sans","Yu Gothic",sans-serif;
+  --font-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1822; --surface:#16232F; --ink:#E6EEF4; --muted:#9AAAB8; --line:#2A3A48;
+  --accent:#4FC1CC; --accent-soft:#173A40; --best:#FF7A55;
+  --good:#5BC98B; --ok:#4FC1CC; --warn:#E8B04A; --bad:#F07A6C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1822; --surface:#16232F; --ink:#E6EEF4; --muted:#9AAAB8; --line:#2A3A48;
+  --accent:#4FC1CC; --accent-soft:#173A40; --best:#FF7A55;
+  --good:#5BC98B; --ok:#4FC1CC; --warn:#E8B04A; --bad:#F07A6C; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1{font-family:var(--font-display);font-weight:400;font-size:1.65rem;line-height:1.3;margin:0;text-wrap:balance;letter-spacing:.02em}
+h2{font-size:1.05rem;font-weight:700;margin:0;text-wrap:balance}
+.lead{margin:6px 0 0;color:var(--muted);font-size:.9rem}
+.asof{display:inline-block;margin-top:8px;font-size:.75rem;color:var(--muted);letter-spacing:.06em}
+
+/* group switcher */
+.switch{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;margin-block:-8px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px}
+.seg button{font:inherit;font-size:.76rem;white-space:nowrap;font-weight:700;border:0;border-radius:9px;padding:9px 2px;background:transparent;color:var(--muted);cursor:pointer;min-width:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.seg button:focus-visible{outline:2px solid var(--best);outline-offset:2px}
+.seg-label{font-size:.75rem;color:var(--muted);letter-spacing:.06em;margin-bottom:4px}
+
+/* rental picker */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.member{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px}
+.member label{font-size:.9rem;min-width:0}
+.member select{font:inherit;font-size:.85rem;padding:7px 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);max-width:11.5em}
+.hint{font-size:.78rem;color:var(--muted);margin:0}
+
+/* bar summary */
+.bars{display:flex;flex-direction:column;gap:8px}
+.bar{display:grid;grid-template-columns:1.6em 1fr auto;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.bar .tag{font-family:var(--font-display);font-size:.95rem;text-align:center}
+.bar .track{height:12px;border-radius:6px;background:var(--accent-soft);overflow:hidden}
+.bar .fill{height:100%;background:var(--muted);opacity:.55;border-radius:6px}
+.bar.best .fill{background:var(--best);opacity:1}
+.bar .amt small{display:block;font-weight:400;font-size:.7rem;color:var(--muted)}
+.facts small{color:var(--muted);font-size:.76rem}
+.bar .amt{font-weight:700;font-size:.92rem;min-width:5.6em;text-align:right}
+
+/* plan cards (lift-ticket look: a perforated stub on the left) */
+.cards{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;display:grid;grid-template-columns:52px 1fr;overflow:hidden}
+.stub{background:var(--accent);color:var(--surface);display:flex;flex-direction:column;align-items:center;padding-top:14px;gap:6px;
+  border-right:2px dashed var(--surface)}
+.card.best .stub{background:var(--best)}
+.stub .letter{font-family:var(--font-display);font-size:1.7rem;line-height:1}
+.stub .rank{font-size:.66rem;font-weight:700;line-height:1.3;text-align:center;padding-inline:2px}
+.body{padding:14px 14px 12px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.title{font-weight:700;font-size:1.02rem;line-height:1.4}
+.date{display:inline-block;font-size:.78rem;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:1px 8px;margin-top:4px}
+.price{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding-block:8px;font-variant-numeric:tabular-nums}
+.price .who{font-size:.8rem;color:var(--muted)}
+.price .big{font-size:1.45rem;font-weight:700}
+.price .sub{font-size:.78rem;color:var(--muted);width:100%}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:.84rem;margin:0}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0;min-width:0}
+.rates{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.rates li{display:grid;grid-template-columns:2em 6.2em 1fr;gap:6px;align-items:baseline;font-size:.84rem}
+.mark{font-weight:700;font-size:1rem;text-align:center}
+.m-ex{color:var(--good)} .m-ok{color:var(--ok)} .m-tri{color:var(--warn)} .m-x{color:var(--bad)}
+.rates .k{color:var(--muted)}
+.note{font-size:.8rem;color:var(--muted);margin:0;border-left:3px solid var(--line);padding-left:8px}
+
+details{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+summary{font-weight:700;cursor:pointer}
+details ul{margin:10px 0 0;padding-left:1.2em;font-size:.84rem;display:flex;flex-direction:column;gap:6px}
+details a{color:var(--accent)}
+.tablewrap{overflow-x:auto;margin-top:10px}
+table{border-collapse:collapse;font-size:.8rem;font-variant-numeric:tabular-nums;min-width:100%}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{color:var(--muted);font-weight:500}
+
+/* ---- ski skin: alpine sky hero, snow-dot ground, punched lift-ticket stubs ---- */
+:root{--sky1:#1E5A8C;--sky2:#5FA8D3;--snow:#FFFFFF;--snow-shade:#D6E6F2;--rock:#2B4A66;--hero-fg:#FFFFFF;--flake:rgba(30,90,140,.07)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sky1:#0A1A2E;--sky2:#1D4468;--snow:#E9F1F7;--snow-shade:#9FB6C9;--rock:#123049;--flake:rgba(160,200,230,.06)}}
+:root[data-theme="dark"]{--sky1:#0A1A2E;--sky2:#1D4468;--snow:#E9F1F7;--snow-shade:#9FB6C9;--rock:#123049;--flake:rgba(160,200,230,.06)}
+body{background-color:var(--bg);background-image:radial-gradient(var(--flake) 1.6px,transparent 1.7px),radial-gradient(var(--flake) 1.2px,transparent 1.3px);background-size:26px 26px,17px 17px;background-position:0 0,9px 13px}
+.hero{position:relative;overflow:hidden;border-radius:18px;padding:22px 18px 92px;color:var(--hero-fg);
+  background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 100%)}
+.hero h1{color:var(--hero-fg);position:relative;z-index:1;text-shadow:0 1px 0 rgba(0,0,0,.15)}
+.hero .lead{color:var(--hero-fg);opacity:.92;position:relative;z-index:1}
+.hero .asof{color:var(--hero-fg);opacity:.85;position:relative;z-index:1;border:1px solid rgba(255,255,255,.45);border-radius:999px;padding:1px 10px}
+.hero .flakes{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.55) 1.4px,transparent 1.6px),radial-gradient(rgba(255,255,255,.35) 1px,transparent 1.2px);background-size:34px 30px,21px 19px;background-position:4px 6px,15px 2px}
+.hero .ridge{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:96px;display:block}
+.hero .ridge .far{fill:var(--snow-shade)} .hero .ridge .rock{fill:var(--rock)} .hero .ridge .near{fill:var(--snow)}
+.hero .tag{position:relative;z-index:1;display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.18em;margin-bottom:6px;opacity:.9}
+h2{display:flex;align-items:center;gap:8px}
+h2::before{content:"";width:14px;height:12px;flex:none;background:var(--accent);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.stub{position:relative;padding-top:24px}
+.stub::before{content:"";position:absolute;top:8px;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--bg);box-shadow:inset 0 1px 2px rgba(0,0,0,.25)}
+.stub::after{content:"LIFT";position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:.55rem;letter-spacing:.2em;opacity:.8;font-weight:700}
+.card{box-shadow:0 1px 0 var(--line)}
+.bar .track{background:repeating-linear-gradient(90deg,var(--accent-soft) 0 10px,transparent 10px 12px)}
+
+
+.photos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.photos a{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-decoration:none;color:var(--ink);background:var(--accent-soft);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:.82rem;font-weight:700;min-width:0}
+.photos a span{font-weight:400;font-size:.72rem;color:var(--muted);overflow-wrap:anywhere}
+.photos a:focus-visible{outline:2px solid var(--best);outline-offset:2px}
+
+.d2{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);margin:-2px 0 6px}
+.d2 input{width:20px;height:20px;accent-color:var(--accent)}
+@media (prefers-reduced-motion:no-preference){.fill{transition:width .35s ease}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="hero">
+    <span class="tag">WINTER TRIP 2026–27</span>
+    <h1>冬スキー7プラン比較<br>しんとうくん</h1>
+    <p class="lead">しんとうくん（大人1人）の金額で、群馬・新潟・長野の7つのプランを比べています。どれも子ども施設・バイキング・アルコール飲み放題つき。みんな7人（大人4・小学生2・年長1）で、土曜の朝に出発して1泊、土日2日滑ります。</p>
+    <span class="asof">2026年10月17日時点の料金</span>
+    <div class="flakes" aria-hidden="true"></div>
+    <svg class="ridge" viewBox="0 0 400 96" preserveAspectRatio="none" aria-hidden="true">
+      <path class="far" d="M0 70 L40 44 L70 58 L118 22 L160 52 L200 34 L246 60 L290 26 L336 54 L372 40 L400 52 L400 96 L0 96Z"/>
+      <path class="rock" d="M118 22 L132 34 L124 38 L140 46 L160 52 L118 40Z M290 26 L304 38 L296 42 L314 48 L290 44Z"/>
+      <path class="near" d="M0 80 L52 62 L96 74 L150 56 L206 76 L262 60 L318 78 L366 64 L400 72 L400 96 L0 96Z"/>
+    </svg>
+  </header>
+
+
+  <section class="panel" aria-labelledby="rent-h">
+    <h2 id="rent-h">レンタルと2日目を選ぶ</h2>
+    <div id="members"></div>
+    <p class="hint">レンタルはスキー場ごとの料金で足しています。2日目に滑らない人は、2日目のリフト券とレンタル分を引きます。グローブ・ゴーグル・帽子はどこも持参です。</p>
+  </section>
+
+  <section class="panel" aria-labelledby="sum-h">
+    <h2 id="sum-h"><span id="sum-who">しんとうくん</span>の総額（安い順）</h2>
+    <div class="bars" id="bars"></div>
+    <p class="hint">宿泊・食事・リフト2日・交通費の割り勘（行き先ごとに計算）・選んだレンタル込み。スクールは別です。</p>
+  </section>
+
+  <section class="cards" id="cards" aria-label="プラン一覧"></section>
+
+  <details>
+    <summary>レンタル料金の一覧（2日分）</summary>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th></th><th>水上高原<br>A</th><th>湯沢中里<br>B</th><th>軽井沢<br>C</th><th>ノルン<br>D</th><th>たんばら<br>E</th><th>ハンター<br>F</th><th>ロイヤルヒル<br>G</th></tr></thead>
+        <tbody id="rtable"></tbody>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>計算の前提</summary>
+    <ul>
+      <li>範囲を群馬・新潟・長野以外にも広げて選び直しました（栃木・福島・山梨も確認）。必須条件（子ども施設・バイキング・アルコール飲み放題）を満たし、男性2人室（伊藤・しんとう）と女性・子ども5人室（久保田・ひらぴ＋子ども3人）で予約できる宿に絞りました。子ども施設はスキー場のキッズパークも含めています。</li>
+      <li>宿泊費は10/17時点のネット予約の料金（Aは水上高原公式、Bはじゃらん・7人1室、C・Gはじゃらん、D・E・Fは楽天トラベル）。Dは5人室44,792円＋2人室22,396円、Eは5人室47,441円＋2人室24,156円、Fは3/6の5人室44,792円（楽天）＋2人室20,196円（じゃらん）。</li>
+      <li>子どもの宿泊費は、各サイトで人数を変えて出した金額の差から割り振っています。C：小学生3,100円・年長1,100円、G：小学生1,550円・年長0円（ファミリー応援プラン・現地現金払い）。</li>
+      <li>今シーズン（2026-27）の公式料金が出ているスキー場：ハンターマウンテン：土日 大人6,500円・小学生5,500円・未就学児無料。軽井沢プリンス：大人1日10,000円（3/13）・小学生以下無料。たんばら：2月の土曜は大人7,000円・小学生4,000円・4歳以上の未就学児2,700円。ノルン：大人6,300円・小学生4,000円・未就学児無料。</li>
+      <li>今シーズンの料金がまだ出ていないスキー場は昨シーズンの公式料金です。湯沢中里：大人6,400円・小学生3,200円・未就学児無料。ロイヤルヒル：大人6,000円、大人券1枚で小学生以下2人まで無料（キッズプラスプレミアム）。</li>
+      <li>Aのリフト1,000円とレンタル2割引は、水上高原の公式サイトのプランで予約した人だけが対象です。</li>
+      <li>交通費は行き先ごとに計算し、大人4人で割っています。レンタカー（8人乗り・2日・免責補償とチャイルドシート込み）約4万円、高速代はドラぷらのETC休日料金で往復、ガソリンは燃費10km/L・1Lあたり170円。D・E・Fはスキー場の土日駐車場（1日1,000円×2日）込み。湯沢IC行きの高速代は水上と塩沢石打の料金からの推定。Eは昭和IC、Fは西那須野塩原IC、Gは諏訪ICまでで計算。</li>
+      <li>移動時間は、自宅から加平ICまで10分＋高速（ドラぷらの通常時間）＋ICからスキー場・宿までの下道です。冬の土曜朝は渋滞や雪道で20〜30分ほど延びることがあります。</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary>出典</summary>
+    <ul>
+      <li><a href="https://www.minakami-ski.jp/accommodation/" target="_blank" rel="noopener">宿泊プラン｜水上高原スキーリゾート公式</a></li>
+      <li><a href="https://www.minakami-ski.jp/price/" target="_blank" rel="noopener">リフト料金｜水上高原スキーリゾート公式</a></li>
+      <li><a href="https://www.jalan.net/yad310076/plan/" target="_blank" rel="noopener">エンゼルグランディア越後中里｜じゃらんnet</a></li>
+      <li><a href="https://www.yuzawa-nakazato.com/winter/fee/" target="_blank" rel="noopener">リフト料金・キッズパーク｜湯沢中里スノーリゾート公式</a></li>
+      <li><a href="https://www.jalan.net/yad318875/plan/" target="_blank" rel="noopener">軽井沢ホテルパイプのけむり｜じゃらんnet</a></li>
+      <li><a href="https://www.princehotels.co.jp/ski/karuizawa/winter/lift/" target="_blank" rel="noopener">リフト料金｜軽井沢プリンスホテルスキー場公式</a></li>
+      <li><a href="https://www.princehotels.co.jp/ski/karuizawa/winter/info/" target="_blank" rel="noopener">レンタル｜軽井沢プリンスホテルスキー場公式</a></li>
+      <li><a href="https://hotel.travel.rakuten.co.jp/hotelinfo/plan/68139" target="_blank" rel="noopener">ホテル湯の陣｜楽天トラベル</a></li>
+      <li><a href="https://norn.co.jp/winter/lift/" target="_blank" rel="noopener">リフト料金｜ノルンみなかみ公式</a></li>
+      <li><a href="https://hotel.travel.rakuten.co.jp/hotelinfo/plan/72748" target="_blank" rel="noopener">伊東園ホテル尾瀬老神 山楽荘｜楽天トラベル</a></li>
+      <li><a href="https://www.tambara.co.jp/winter/ticket/" target="_blank" rel="noopener">リフトチケット｜たんばらスキーパーク公式</a></li>
+      <li><a href="https://hotel.travel.rakuten.co.jp/hotelinfo/plan/72035" target="_blank" rel="noopener">伊東園ホテル塩原｜楽天トラベル</a></li>
+      <li><a href="https://www.hunter.co.jp/winter/ticket/" target="_blank" rel="noopener">リフトチケット｜ハンターマウンテン塩原公式</a></li>
+      <li><a href="https://www.jalan.net/yad314524/plan/" target="_blank" rel="noopener">白樺湖ホテルパイプのけむり｜じゃらんnet</a></li>
+      <li><a href="https://yukiyama-web.com/skiarea/240" target="_blank" rel="noopener">白樺湖ロイヤルヒル｜yukiyama</a></li>
+      <li><a href="https://www.driveplaza.com/" target="_blank" rel="noopener">高速料金・ルート検索｜ドラぷら</a></li>
+    </ul>
+  </details>
+</div>
+
+<script>
+(function(){
+  // Rental prices for 2 days, by resort
+  var RENT = {
+    minakami:{name:"水上高原", kid:{ski:5600,board:5600,skiwear:9600,boardwear:9600}, adult:{ski:8000,board:8000,skiwear:13600,boardwear:13600}},
+    nakazato:{name:"湯沢中里", kid:{ski:7000,board:7000,skiwear:11000,boardwear:11000}, adult:{ski:10000,board:10000,skiwear:16000,boardwear:16000}},
+    karuizawa:{name:"軽井沢", kid:{ski:13000,board:13000,skiwear:22000,boardwear:22000}, adult:{ski:15000,board:15000,skiwear:26000,boardwear:26000}},
+    norn:{name:"ノルン", kid:{ski:9000,board:9000,skiwear:18000,boardwear:18000}, adult:{ski:12000,board:12000,skiwear:24000,boardwear:24000}},
+    tanbara:{name:"たんばら", kid:{ski:7800,board:7800,skiwear:14000,boardwear:14000}, adult:{ski:11400,board:11400,skiwear:20800,boardwear:20800}},
+    hunter:{name:"ハンター", kid:{ski:9000,board:9000,skiwear:12000,boardwear:12000}, adult:{ski:13000,board:13000,skiwear:25000,boardwear:25000}},
+    royalhill:{name:"ロイヤルヒル", kid:{ski:7000,board:7000,skiwear:14000,boardwear:14000}, adult:{ski:9000,board:9000,skiwear:16000,boardwear:16000}}
+  };
+  var OPTS = [["none","借りない"],["ski","スキー"],["board","ボード"],["skiwear","スキー＋ウェア"],["boardwear","ボード＋ウェア"]];
+
+  var GROUPS = {
+    shinto:{label:"しんとうくん", members:[{n:"しんとうくん",t:"adult",d:"none"}]}
+  };
+
+  // base = lodging + meals + lift 2 days + this plan's transport share (rental car, tolls, gas split by 4 adults)
+  var PLANS = [
+    {"id": "A", "liftIncl": false, "lift2": {"adult": 1000, "kid": 1000, "pre": 0}, "roomUrl": "https://www.minakamikogen200.jp/accommodation/", "kidsUrl": "https://www.minakami-ski.jp/kids_family/", "kidsName": "水上高原のキッズパーク", "name": "水上高原（群馬）", "date": "12/19（土）〜20（日）オープン週", "hotel": "水上高原ホテル200", "access": "ゲレンデ直結", "area": "水上高原（群馬）", "rooms": "5人室＋2人室", "resort": "minakami", "t": {"total": 55360, "toll": 8560, "gas": 6800, "park": 0, "km": 402, "hw": "2時間1分", "local": 30, "door": "約2時間40分"}, "rates": [["ex", "子ども施設", "キッズパーク2か所・託児・2段ベッドの部屋"], ["ex", "バイキング", "和洋中バイキング"], ["ex", "飲み放題", "アルコール飲み放題がプランに込み"], ["ex", "コスパ", "宿泊者はリフト1日1,000円"], ["ex", "温泉", "露天風呂（眺望の湯）と大浴場"], ["tri", "雪", "オープン2日目。滑れるコースが限られるかも"]], "note": "群馬のベスト。必須の3つ（子ども施設・バイキング・飲み放題）がそろい、値段も最安クラス。リフト1,000円は公式サイトのプランで予約した人だけが対象です。", "share": 13840, "total7": 163560, "drive": "約2時間40分", "base": {"shinto": 33990}},
+    {"id": "B", "liftIncl": false, "lift2": {"adult": 6400, "kid": 3200, "pre": 0}, "roomUrl": "https://www.jalan.net/yad310076/photo/", "kidsUrl": "https://iko-yo.net/facilities/15916", "kidsName": "湯沢中里のキッズパーク", "name": "エンゼルグランディア（新潟）", "date": "3/27（土）〜28（日）", "hotel": "エンゼルグランディア越後中里", "access": "ゲレンデまで徒歩5分", "area": "湯沢中里（新潟）", "rooms": "7人で1部屋（和室・8名定員）", "resort": "nakazato", "t": {"total": 56260, "toll": 9160, "gas": 7100, "park": 0, "km": 418, "hw": "2時間17分", "local": 10, "door": "約2時間35分"}, "rates": [["ex", "子ども施設", "スノーエスカレーター3基、ホテルに屋内プール・チュービング・縁日"], ["ok", "バイキング", "バイキング（評価4.5）"], ["ok", "飲み放題", "「冬★夕食時飲み放題付」プラン（75分）"], ["tri", "コスパ", "宿は手ごろだがリフト券は別"], ["ex", "温泉", "露天風呂、サウナ、ジャグジー"], ["tri", "雪", "昨シーズンは3/29で営業終了。最終盤"]], "note": "新潟のベスト。雪以外でも子どもが楽しめます。湯沢中里の昨シーズンの営業は3/29までで、3/27は最終盤です。", "share": 14065, "total7": 216530, "drive": "約2時間35分", "base": {"shinto": 43155}},
+    {"id": "C", "liftIncl": false, "lift2": {"adult": 10000, "kid": 0, "pre": 0}, "roomUrl": "https://www.jalan.net/yad318875/photo/", "kidsUrl": "https://www.princehotels.co.jp/ski/karuizawa/winter/coursemap/?tab=park", "kidsName": "スノーマンパーク（軽井沢プリンス）", "name": "パイプのけむり軽井沢（長野）", "date": "3/13（土）〜14（日）", "hotel": "軽井沢ホテルパイプのけむり", "access": "スキー場まで車で約15分", "area": "軽井沢プリンスホテルスキー場（長野）", "rooms": "5人室＋2人室（洋室）", "resort": "karuizawa", "t": {"total": 55520, "toll": 9120, "gas": 6400, "park": 0, "km": 374, "hw": "1時間58分", "local": 25, "door": "約2時間35分"}, "rates": [["ok", "子ども施設", "スキー場にスノーマンパーク（ソリ・スノーエスカレーター・チュービング）。小学生以下リフト無料"], ["ok", "バイキング", "朝夕バイキング"], ["ex", "飲み放題", "アルコール飲み放題がプランに込み"], ["ok", "コスパ", "宿は7人で44,100円と安いが、大人のリフト券が1日1万円"], ["tri", "温泉", "温泉ではなく大浴場（北投石の湯）"], ["tri", "雪", "人工雪が中心。コースは初心者向け"]], "note": "長野のベスト。3/13はリフトが通常料金の日（2/27などトップシーズンの土曜は大人1日12,000円）。宿からスキー場までは車で移動します。", "share": 13880, "total7": 179620, "drive": "約2時間35分", "base": {"shinto": 43080}},
+    {"id": "D", "liftIncl": false, "lift2": {"adult": 6300, "kid": 4000, "pre": 0}, "roomUrl": "https://www.jalan.net/yad315400/photo/", "kidsUrl": "https://norn.co.jp/winter/gerande/#snowland", "kidsName": "ノルンみなかみスノーランド", "name": "湯の陣×ノルン（群馬）", "date": "2/27（土）〜28（日）", "hotel": "ホテル湯の陣【伊東園ホテルズ】", "access": "スキー場まで車で約15分", "area": "ノルンみなかみ（群馬）", "rooms": "男性2人室（ツイン）＋女性・子ども5人室（和室10畳）", "resort": "norn", "t": {"total": 57260, "toll": 8560, "gas": 6700, "park": 2000, "km": 394, "hw": "2時間1分", "local": 15, "door": "約2時間25分"}, "rates": [["ok", "子ども施設", "ノルンのスノーランド（ソリ・チュービング・ストライダー）。宿に子ども向けの設備はなし"], ["ok", "バイキング", "約50種の夕朝食バイキング"], ["ex", "飲み放題", "生ビール・ワイン・焼酎・日本酒の飲み放題が込み"], ["ex", "コスパ", "宿は7人で67,188円。未就学児はリフト無料"], ["ok", "温泉", "ゆびそ温泉の露天・内湯（各2）"], ["ok", "雪", "標高820〜1,220m。2月末なら安定"]], "note": "伊東園の定番プラン。宿が安く、飲み放題込み。ノルンの駐車場は土日1日1,000円です。", "share": 14315, "total7": 190848, "drive": "約2時間25分", "base": {"shinto": 38113}},
+    {"id": "E", "liftIncl": false, "lift2": {"adult": 7000, "kid": 4000, "pre": 2700}, "roomUrl": "https://www.jalan.net/yad324185/photo/", "kidsUrl": "https://www.tambara.co.jp/winter/family/", "kidsName": "たんばらのキッズパーク", "name": "山楽荘×たんばら（群馬）", "date": "2/27（土）〜28（日）", "hotel": "伊東園ホテル尾瀬老神 山楽荘", "access": "スキー場まで車で約35分", "area": "たんばらスキーパーク（群馬）", "rooms": "男性2人室＋女性・子ども5人室（和室）", "resort": "tanbara", "t": {"total": 57000, "toll": 8000, "gas": 7000, "park": 2000, "km": 413, "hw": "1時間46分", "local": 35, "door": "約2時間30分"}, "rates": [["ex", "子ども施設", "たんばらのキッズパーク（そり・チュービング・スノーストライダー）"], ["ok", "バイキング", "夕朝食バイキング（金目鯛の煮付け付き）"], ["ex", "飲み放題", "生ビール・お酒の飲み放題が込み"], ["ok", "コスパ", "宿は手ごろだが、2月は大人のリフト券が1日7,000円で年長も2,700円"], ["ex", "温泉", "老神温泉。源泉かけ流し、露天あり"], ["ex", "雪", "標高1,250〜1,550m。雪質がよく5月まで営業"]], "note": "雪と温泉で選ぶならここ。宿からスキー場まで車で約35分。たんばらの駐車場は土日1日1,000円です。", "share": 14250, "total7": 205997, "drive": "約2時間30分", "base": {"shinto": 40328}},
+    {"id": "F", "liftIncl": false, "lift2": {"adult": 6500, "kid": 5500, "pre": 0}, "roomUrl": "https://hotel.travel.rakuten.co.jp/hotelinfo/plan/72035", "kidsUrl": "https://www.hunter.co.jp/winter/family/kidspark/", "kidsName": "ハンターマウンテンのキッズパーク", "name": "伊東園ホテル塩原×ハンターマウンテン（栃木）", "date": "3/6（土）〜7（日）", "hotel": "伊東園ホテル塩原", "access": "スキー場まで車で約30分（宿泊者用の無料シャトルバスもあり）", "area": "ハンターマウンテン塩原（栃木）", "rooms": "男性2人室＋女性・子ども5人室（和室18畳）", "resort": "hunter", "t": {"total": 57180, "toll": 7880, "gas": 7300, "park": 2000, "km": 427, "hw": "1時間36分", "local": 50, "door": "約2時間35分"}, "rates": [["ex", "子ども施設", "ハンターのキッズパーク（ソリ専用ゲレンデ・チュービング、リフト込み2,000円）。未就学児はリフト無料"], ["ok", "バイキング", "夕朝食バイキング"], ["ex", "飲み放題", "夕食時のアルコール飲み放題が込み"], ["ok", "コスパ", "宿は7人で64,988円と安いが、小学生のリフト券が1日5,500円"], ["ok", "温泉", "塩原温泉の露天・内湯・サウナ"], ["ex", "雪", "標高1,138〜1,638m。首都圏最大級で5月まで営業"]], "note": "栃木のベスト。高速は1時間36分と7案で一番短い。宿からスキー場は日塩もみじライン経由で約30分です。", "share": 14295, "total7": 196168, "drive": "約2時間35分", "base": {"shinto": 37393}},
+    {"id": "G", "liftIncl": false, "lift2": {"adult": 6000, "kid": 0, "pre": 0}, "roomUrl": "https://www.jalan.net/yad314524/photo/", "kidsUrl": "https://iko-yo.net/facilities/2326", "kidsName": "白樺湖ロイヤルヒル", "name": "パイプのけむり白樺湖（長野）", "date": "2/27（土）〜28（日）", "hotel": "白樺湖ホテルパイプのけむり", "access": "スキー場まで車で約10分", "area": "白樺湖ロイヤルヒル（長野）", "rooms": "5人室＋2人室（洋室）", "resort": "royalhill", "t": {"total": 57200, "toll": 9200, "gas": 8000, "park": 0, "km": 470, "hw": "2時間43分", "local": 40, "door": "約3時間35分"}, "rates": [["ex", "子ども施設", "宿にキッズルーム（無料）。スキー場に雪遊び広場・ソリコース、小学生以下リフト無料"], ["ok", "バイキング", "約30種のバイキング"], ["ex", "飲み放題", "生ビール込み90分飲み放題"], ["ex", "コスパ", "宿は7人で43,400円と最安"], ["ok", "温泉", "湖を望む大浴場と露天風呂"], ["ex", "雪", "標高1,450〜1,750m。雪が安定"]], "note": "安さと子ども向けで選ぶならここ。ただし移動は約3時間35分と7案で一番遠く、3時間の目安を超えます。", "share": 14300, "total7": 148600, "drive": "約3時間35分", "base": {"shinto": 36300}}
+  ];
+  var MARK = {ex:["◎","m-ex"], ok:["○","m-ok"], tri:["△","m-tri"], x:["×","m-x"]};
+
+  var state = {g:"shinto", sel:{}};
+  try{ var saved = JSON.parse(localStorage.getItem("ski5-shinto") || "null"); if(saved && saved.sel) state.sel = saved.sel; if(saved && saved.d2) state.d2 = saved.d2; state.g = "shinto"; }catch(e){}
+  Object.keys(GROUPS).forEach(function(k){
+    if(!state.sel[k]) state.sel[k] = GROUPS[k].members.map(function(m){return m.d;});
+  });
+  function save(){ try{ localStorage.setItem("ski5-shinto", JSON.stringify(state)); }catch(e){} }
+
+  function yen(n){ return n.toLocaleString("ja-JP") + "円"; }
+  function man(n){ return "約" + (Math.round(n/1000)/10).toFixed(1) + "万円"; }
+  if(!state.d2) state.d2 = {};
+  Object.keys(GROUPS).forEach(function(k){ if(!state.d2[k]) state.d2[k] = GROUPS[k].members.map(function(){ return true; }); });
+  // Naeba prices the 2nd day lower; elsewhere the 2-day price is two equal days
+  var NAEBA_D2 = {kid:{ski:5000,board:5500,skiwear:9000,boardwear:9500}, adult:{ski:6500,board:6500,skiwear:11500,boardwear:11500}};
+  function rentDay2(resort, t, o){ return resort === "naeba" ? NAEBA_D2[t][o] : RENT[resort][t][o] / 2; }
+  function skisDay2(g, i){ return state.d2[g][i] !== false; }
+  function rentalFor(plan, g){
+    var r = RENT[plan.resort], sum = 0;
+    GROUPS[g].members.forEach(function(m, i){
+      var o = state.sel[g][i];
+      if(o && o !== "none" && r[m.t][o] != null){ sum += r[m.t][o]; if(!skisDay2(g, i)) sum -= rentDay2(plan.resort, m.t, o); }
+    });
+    return sum;
+  }
+  function liftCut(plan, g){
+    var cut = 0;
+    GROUPS[g].members.forEach(function(m, i){
+      if(!skisDay2(g, i)) cut += m.t === "adult" ? plan.lift2.adult : (m.p ? plan.lift2.pre : plan.lift2.kid);
+    });
+    return cut;
+  }
+  function boardNG(plan, g){ var r = RENT[plan.resort]; return GROUPS[g].members.some(function(m, i){ var o = state.sel[g][i]; return o && o !== "none" && r[m.t][o] == null; }); }
+  function anyOff(g){ return state.d2[g].some(function(v){ return v === false; }); }
+  function totalFor(plan, g){ return plan.base[g] - liftCut(plan, g) + rentalFor(plan, g); }
+
+  // segmented control
+  var seg = document.getElementById("seg");
+  if(seg) Object.keys(GROUPS).forEach(function(k){
+    var b = document.createElement("button");
+    b.type = "button"; b.id = "seg-" + k; b.textContent = GROUPS[k].label;
+    b.addEventListener("click", function(){ state.g = k; save(); render(); });
+    seg.appendChild(b);
+  });
+
+  function renderMembers(){
+    var box = document.getElementById("members"); box.innerHTML = "";
+    GROUPS[state.g].members.forEach(function(m, i){
+      var row = document.createElement("div"); row.className = "member";
+      var id = "rent-" + state.g + "-" + i;
+      var lab = document.createElement("label"); lab.htmlFor = id; lab.textContent = m.n + (m.t === "kid" ? "" : "");
+      var s = document.createElement("select"); s.id = id;
+      OPTS.forEach(function(o){ var op = document.createElement("option"); op.value = o[0]; op.textContent = o[1]; s.appendChild(op); });
+      s.value = state.sel[state.g][i] || "none";
+      s.addEventListener("change", function(){ state.sel[state.g][i] = s.value; save(); renderNumbers(); });
+      row.appendChild(lab); row.appendChild(s); box.appendChild(row);
+      var dl = document.createElement("label"); dl.className = "d2";
+      var cb = document.createElement("input"); cb.type = "checkbox"; cb.id = "d2-" + state.g + "-" + i; cb.checked = skisDay2(state.g, i);
+      cb.addEventListener("change", function(){ state.d2[state.g][i] = cb.checked; save(); renderNumbers(); });
+      dl.appendChild(cb); dl.appendChild(document.createTextNode("2日目（日曜）も滑る"));
+      box.appendChild(dl);
+    });
+  }
+
+  function renderNumbers(){
+    var g = state.g;
+    document.getElementById("sum-who").textContent = GROUPS[g].label;
+    var sorted = PLANS.slice().sort(function(a,b){ return totalFor(a,g) - totalFor(b,g); });
+    var max = totalFor(sorted[sorted.length-1], g);
+    var bars = document.getElementById("bars"); bars.innerHTML = "";
+    sorted.forEach(function(p, i){
+      var t = totalFor(p, g);
+      var row = document.createElement("div"); row.className = "bar" + (i === 0 ? " best" : "");
+      row.innerHTML = '<span class="tag">' + p.id + '</span><div class="track"><div class="fill" style="width:' + (t/max*100).toFixed(1) + '%"></div></div><span class="amt">' + man(t) + '<small>' + p.drive + '</small></span>';
+      row.title = p.name + "：" + yen(t);
+      bars.appendChild(row);
+    });
+    var cards = document.getElementById("cards"); cards.innerHTML = "";
+    sorted.forEach(function(p, i){
+      var t = totalFor(p, g), rent = rentalFor(p, g);
+      var c = document.createElement("article"); c.className = "card" + (i === 0 ? " best" : "");
+      c.id = "plan-" + p.id;
+      var rates = p.rates.map(function(r){ var m = MARK[r[0]]; return '<li><span class="mark ' + m[1] + '" aria-label="' + m[0] + '">' + m[0] + '</span><span class="k">' + r[1] + '</span><span>' + r[2] + '</span></li>'; }).join("");
+      c.innerHTML =
+        '<div class="stub"><span class="letter">' + p.id + '</span><span class="rank">' + (i === 0 ? "最安" : (i+1) + "位") + '</span></div>' +
+        '<div class="body">' +
+          '<div><div class="title">' + p.name + '</div><span class="date">' + p.date + '</span></div>' +
+          '<div class="price"><span class="who">' + GROUPS[g].label + 'の総額</span><span class="big">' + man(t) + '</span>' +
+            '<span class="sub">うちレンタル ' + (rent ? yen(rent) : "なし") + '　／　7人の合計（レンタル別）' + man(p.total7) + '</span></div>' +
+          '<dl class="facts"><dt>宿</dt><dd>' + p.hotel + '（' + p.access + '）</dd><dt>スキー場</dt><dd>' + p.area + '</dd><dt>移動</dt><dd>車で' + p.drive + '（高速' + p.t.hw + '＋下道' + p.t.local + '分）</dd><dt>交通費</dt><dd>7人で' + yen(p.t.total) + '、大人1人' + yen(p.share) + '<br><small>レンタカー' + yen(40000) + '・高速 往復' + yen(p.t.toll) + '・ガソリン約' + yen(p.t.gas) + (p.t.park ? '・駐車場' + yen(p.t.park) : '') + '</small></dd><dt>部屋</dt><dd>' + p.rooms + '</dd></dl>' +
+          '<ul class="rates">' + rates + '</ul>' +
+          '<div class="photos"><a href="' + p.roomUrl + '" target="_blank" rel="noopener">部屋の写真を見る<span>' + p.hotel + '</span></a><a href="' + p.kidsUrl + '" target="_blank" rel="noopener">キッズパークの写真を見る<span>' + p.kidsName + '</span></a></div>' +
+          (anyOff(g) ? '<p class="note">2日目に滑らない人の分として ' + (liftCut(p, g) ? 'リフト券 ' + yen(liftCut(p, g)) : 'リフト券 0円') + ' を引いています。' + (p.liftIncl ? 'リフト券込みのプランなので、滑らなくても宿泊費は変わりません。' : '') + '</p>' : '') +
+          (boardNG(p, g) ? '<p class="note">このスキー場はスキー専用で、ボードのレンタルはできません（ボードの人の分は足していません）。</p>' : '') +
+          '<p class="note">' + p.note + '</p>' +
+        '</div>';
+      cards.appendChild(c);
+    });
+  }
+
+  function renderTable(){
+    var rows = [["子ども：スキー","kid","ski"],["子ども：ボード","kid","board"],["子ども：スキー＋ウェア","kid","skiwear"],["子ども：ボード＋ウェア","kid","boardwear"],["大人：スキー／ボード","adult","ski"],["大人：ウェア込み","adult","skiwear"]];
+    var order = ["minakami","nakazato","karuizawa","norn","tanbara","hunter","royalhill"];
+    document.getElementById("rtable").innerHTML = rows.map(function(r){
+      return "<tr><td>" + r[0] + "</td>" + order.map(function(k){ var v = RENT[k][r[1]][r[2]]; return "<td>" + (v == null ? "不可" : yen(v)) + "</td>"; }).join("") + "</tr>";
+    }).join("");
+  }
+
+  function render(){
+    Object.keys(GROUPS).forEach(function(k){ var el = document.getElementById("seg-" + k); if(el) el.setAttribute("aria-pressed", k === state.g ? "true" : "false"); });
+    renderMembers(); renderNumbers();
+  }
+  renderTable(); render();
+})();
+</script>
+
+</body>
+</html>
